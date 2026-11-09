@@ -2,8 +2,9 @@ name: Refresh jobs
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # quick: new postings only (each site has its own cadence inside)
-    - cron: "0 18 * * *"     # full sweep: 2 AM Manila (UTC+8)
+    # Off-peak minutes: GitHub delays or drops many runs scheduled at :00 / :30.
+    - cron: "13,43 * * * *"  # quick: new postings only (each site has its own cadence inside)
+    - cron: "17 18 * * *"    # full sweep: 2:17 AM Manila (UTC+8)
   workflow_dispatch:         # "Search now" button on the website, or "Run workflow" on GitHub
     inputs:
       mode:
@@ -35,7 +36,7 @@ jobs:
       - name: Scrape
         run: |
           MODE="${{ github.event.inputs.mode }}"
-          if [ "${{ github.event.schedule }}" = "0 18 * * *" ]; then MODE=full; fi
+          if [ "${{ github.event.schedule }}" = "17 18 * * *" ]; then MODE=full; fi
           FORCE=""
           if [ "${{ github.event.inputs.force }}" = "true" ]; then FORCE="--force"; fi
           python run_scrape.py --mode "${MODE:-quick}" $FORCE
