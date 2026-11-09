@@ -57,7 +57,7 @@ SEARCH_KEYWORDS_LIGHT = [
 
 # Titles in another engineering discipline / IT are not for her (she is a Civil Engineer).
 WRONG_DISCIPLINE = re.compile(
-    r"\b(electrical|electronics?|mechanical|software|it|network|devops|reliability|sre|chemical|process|"
+    r"\b(electrical|electronics?|ee|ece|eee|mechanical|software|it|network|devops|reliability|sre|chemical|process|"
     r"industrial|mepf?|plumbing|sanitary|telecoms?|hvac|fdas|instrumentation|systems?|cloud|qa|"
     r"security|automation|maintenance|manufacturing|production|biomedical|geodetic|marine|petroleum|"
     r"mining|solar|fire\s*protection|aircon|elevator|piping|welding|automotive|computer|web|sales|"
@@ -74,8 +74,9 @@ SENIOR_TITLE = re.compile(
     r"vice\s*president|vp|officer[-\s]in[-\s]charge|oic|consultant|specialist\s*iii)\b",
     re.I,
 )
-# A description that ONLY asks for >= this many years of experience is treated as senior.
-SENIOR_MIN_YEARS = 3
+# She has a few months of experience: an ad asking for this many years or more is hidden
+# (unless it also says fresh graduates / entry level are welcome).
+MAX_EXPERIENCE_YEARS = 1
 
 # --------------------------------------------------------------------------------------
 # Locations: Metro Manila + nearby provinces. Overseas is skipped.

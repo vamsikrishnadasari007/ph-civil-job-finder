@@ -52,7 +52,8 @@
     return { ok: r.ok, status: r.status, data };
   }
 
-  const defaults = () => ({ days: 14, roles: [], areas: [], platforms: [], q: "", sort: "new", salary: false, email: false });
+  const EXP_LEVELS = ["Fresh graduates OK", "No experience needed", "Less than 1 year", "Experience not mentioned", "Some experience preferred"];
+  const defaults = () => ({ days: 14, roles: [], exps: [], areas: [], platforms: [], q: "", sort: "new", salary: false, email: false });
   let F = Object.assign(defaults(), store.get("filters", {}));
   let tab = "all";
 
@@ -119,6 +120,7 @@
   function passes(j, skip) {
     if (skip !== "days" && daysAgo(j) > F.days) return false;
     if (skip !== "roles" && F.roles.length && !j.roles.some((r) => F.roles.includes(r))) return false;
+    if (skip !== "exps" && F.exps.length && !F.exps.includes(j.experience)) return false;
     if (skip !== "areas" && F.areas.length && !F.areas.includes(j.area)) return false;
     if (skip !== "platforms" && F.platforms.length && !platformsOf(j).some((p) => F.platforms.includes(p))) return false;
     if (F.salary && !j.salary) return false;
@@ -168,6 +170,10 @@
     chipGroup($("#f-role"), Object.keys(DATA.roles).map((r) => ({ label: r, value: r, count: rc[r] || 0 })),
       (v) => F.roles.includes(v), true, (v) => { F.roles = toggleIn(F.roles, v); update(); });
 
+    const ec = facet("exps", (j) => [j.experience]);
+    chipGroup($("#f-exp"), EXP_LEVELS.filter((x) => ec[x] || F.exps.includes(x)).map((x) => ({ label: x, value: x, count: ec[x] || 0 })),
+      (v) => F.exps.includes(v), true, (v) => { F.exps = toggleIn(F.exps, v); update(); });
+
     const ac = facet("areas", (j) => [j.area]);
     chipGroup($("#f-area"), DATA.areas.map((a) => ({ label: a, value: a, count: ac[a] || 0 })),
       (v) => F.areas.includes(v), true, (v) => { F.areas = toggleIn(F.areas, v); update(); });
@@ -201,6 +207,7 @@
       ${j.salary ? `<p class="sal">${esc(j.salary)}</p>` : ""}
       <div class="tags">
         ${j.roles.map((r) => `<span class="tag">${esc(r)}</span>`).join("")}
+        ${j.experience ? `<span class="tag exp${/^(Fresh|No exp|Less)/.test(j.experience) ? " good" : ""}">${esc(j.experience)}</span>` : ""}
         ${j.work_type ? `<span class="tag">${esc(j.work_type)}</span>` : ""}
         ${j.resume ? `<span class="tag resume">Send: ${esc(j.resume)} resume</span>` : ""}
       </div>
@@ -226,7 +233,7 @@
     let note = `${l.length} job${l.length === 1 ? "" : "s"}`;
     if (tab === "hidden") {
       const hc = DATA.hidden_counts || {};
-      note += " hidden for you (male only/preferred, senior, or overseas). Not shown at all: " +
+      note += " hidden for you (male only/preferred, needs too much experience, internship or overseas). Not shown at all: " +
         Object.entries(hc).filter(([r]) => !DATA.hidden.some((h) => h.hidden_reason === r))
           .map(([r, n]) => `${n} ${r}`).join(", ");
     }
@@ -251,6 +258,7 @@
       "Job title": j.title,
       "Company": j.company,
       "Matching role(s)": j.roles.join(", "),
+      "Experience asked": j.experience || "",
       "Resume to send": j.resume ? `${j.resume} resume` : "",
       "Location": j.location,
       "Area": j.area,
@@ -360,6 +368,7 @@
       // Drop remembered filter values that no longer exist.
       F.roles = F.roles.filter((r) => r in d.roles);
       F.areas = F.areas.filter((a) => d.areas.includes(a));
+      F.exps = (F.exps || []).filter((x) => EXP_LEVELS.includes(x));
       F.platforms = F.platforms.filter((p) => p in d.sources);
       renderHeader();
       wire();

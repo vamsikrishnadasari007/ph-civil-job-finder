@@ -29,6 +29,7 @@ create table if not exists jobfinder.postings (
   emails           text[] not null default '{}',
   phones           text[] not null default '{}',
   hidden_reason    text,                             -- null = shown
+  experience       text not null default '',          -- 'Fresh graduates OK' / 'Needs 2+ years' / ...
   dedupe_key       text not null,
   first_seen       timestamptz not null default now(),
   last_seen        timestamptz not null default now(),
@@ -99,7 +100,8 @@ select m.id, m.platform, m.platform_id, m.title, m.company, m.url, m.location, m
        m.posted_at, m.posted_precision, m.roles, m.resume, m.emails, m.phones, m.dedupe_key,
        m.first_seen,
        coalesce((select jsonb_agg(jsonb_build_object('platform', o.platform, 'url', o.url))
-                 from vis o where o.dedupe_key = m.dedupe_key and o.rn > 1), '[]'::jsonb) as also_on
+                 from vis o where o.dedupe_key = m.dedupe_key and o.rn > 1), '[]'::jsonb) as also_on,
+       m.experience
 from vis m
 where m.rn = 1;
 
@@ -107,10 +109,10 @@ where m.rn = 1;
 create or replace view jobfinder.hidden as
 select id, platform, platform_id, title, company, url, location, area, address, salary, work_type,
        left(description, 3000) as description, posted_at, posted_precision, roles, resume,
-       emails, phones, dedupe_key, first_seen, hidden_reason, '[]'::jsonb as also_on
+       emails, phones, dedupe_key, first_seen, hidden_reason, '[]'::jsonb as also_on, experience
 from jobfinder.postings
 where is_active and hidden_reason is not null
-  and hidden_reason in ('male only / male preferred', 'senior / too much experience required', 'overseas')
+  and hidden_reason in ('male only / male preferred', 'senior / too much experience required', 'overseas', 'internship')
   and posted_at > now() - interval '15 days';
 
 -- Count of hidden jobs by reason (for "N hidden" on the website).

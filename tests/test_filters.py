@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pytest  # noqa: E402
 
-from pipeline.filters import area_of, is_male_restricted, is_senior, match_roles  # noqa: E402
+from pipeline.filters import area_of, experience_label, is_male_restricted, is_senior, match_roles  # noqa: E402
 
 MUST_HIDE = [
     "Male only",
@@ -80,12 +80,43 @@ def test_roles(title, roles):
     assert match_roles(title) == roles
 
 
-def test_senior():
+def test_senior_title():
     assert is_senior("Senior Site Engineer", "")
-    assert is_senior("Site Engineer", "At least 5 years of relevant experience")
-    assert not is_senior("Site Engineer", "At least 1 year of experience; fresh graduates welcome")
-    assert not is_senior("Site Engineer", "Structural: at least 5 years experience. Site: 2 years experience")
     assert not is_senior("Junior Site Engineer", "")
+
+
+# Real wording seen in PH ads (from the audit of scraped jobs).
+@pytest.mark.parametrize("text,label,hide", [
+    ("At least three years of experience as a Cost Estimator or Quantity Surveyor", "Needs 3+ years", True),
+    ("At least 2-years' work experience in handling contractual issues", "Needs 2+ years", True),
+    ("With at least 1-2 years of related working experience", "Needs 1+ years", True),
+    ("At least 1–2 years of relevant experience in project engineering", "Needs 1+ years", True),
+    ("At least 3 to 4 years or equivalent work experience as Project Engineer", "Needs 3+ years", True),
+    ("Minimum of 5 years and up of proven construction experience", "Needs 5+ years", True),
+    ("Minimum of two (2) years experience in construction", "Needs 2+ years", True),
+    ("At least 1 year of relevant experience in the construction industry", "Needs 1+ years", True),
+    ("1-4 years of experience working in engineering", "Needs 1+ years", True),
+    ("Structural Engineer: at least 5 years experience. Site Engineer: 2 years experience", "Needs 2+ years", True),
+    ("With 6 months - 1 year experience in trenches or pump house construction", "Less than 1 year", False),
+    ("0-1 year of experience", "No experience needed", False),
+    ("At least 1 year of experience; fresh graduates are welcome to apply", "Fresh graduates OK", False),
+    ("Fresh graduates may apply", "Fresh graduates OK", False),
+    ("Entry level position", "Fresh graduates OK", False),
+    ("Experience is an advantage but not required", "Fresh graduates OK", False),
+    ("Must be a licensed civil engineer. Proficient in AutoCAD.", "Experience not mentioned", False),
+    ("Preferably with experience in fit out construction", "Some experience preferred", False),
+    ("Experienced in construction and quantity surveying", "Some experience preferred", False),
+    ("You will work alongside experienced engineers", "Experience not mentioned", False),
+    ("Our company has 25 years of experience in construction. Must be a licensed CE.", "Experience not mentioned", False),
+    ("Must be 21-35 years old", "Experience not mentioned", False),
+    ("* Minimum of **5 years** of experience in the same capacity", "Needs 5+ years", True),
+    ("**1-3 years** experience in cost engineering", "Needs 1+ years", True),
+    ("* At least 2 years relevant work experince as a Project Engineer", "Needs 2+ years", True),
+    ("Minimum 3 years experience. SAP experience is a plus", "Needs 3+ years", True),
+    ("At least 1–2 years of experience but fresh graduates are also encouraged to apply", "Fresh graduates OK", False),
+])
+def test_experience(text, label, hide):
+    assert experience_label("Site Engineer", text) == (label, hide)
 
 
 def test_area():
@@ -112,6 +143,7 @@ def _job(title, location="Taguig City, Metro Manila", description=""):
     ("Site Engineer", "Cebu City, Cebu", "outside Metro Manila & nearby"),
     ("Site Engineer - Saudi Arabia", "Makati", "overseas"),
     ("Accountant", "Makati", "not a target role"),
+    ("Civil Engineer Intern", "Makati", "internship"),
 ])
 def test_prefilter(title, location, reason):
     assert prefilter_reason(_job(title, location)) == reason

@@ -25,6 +25,7 @@ class Job:
     roles: list[str] = field(default_factory=list)
     resume: str = ""
     area: str = ""                # Metro Manila / Cavite / ...
+    experience: str = ""          # "Fresh graduates OK" / "Less than 1 year" / "Needs 2+ years" / "Experience not mentioned"
     emails: list[str] = field(default_factory=list)
     phones: list[str] = field(default_factory=list)
     hidden_reason: str = ""       # "" = shown; otherwise why it is hidden

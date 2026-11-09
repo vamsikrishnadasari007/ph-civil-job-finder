@@ -41,7 +41,7 @@ def to_row(j: Job, now: str) -> dict:
         "title": j.title, "company": j.company, "url": j.url, "location": j.location, "area": j.area,
         "address": j.address, "salary": j.salary, "work_type": j.work_type, "company_url": j.company_url,
         "description": j.description, "posted_at": j.posted_at or None, "posted_precision": j.posted_precision,
-        "roles": j.roles, "resume": j.resume, "emails": j.emails, "phones": j.phones,
+        "roles": j.roles, "resume": j.resume, "emails": j.emails, "phones": j.phones, "experience": j.experience,
         "hidden_reason": j.hidden_reason or None, "dedupe_key": dedupe_key(j),
         "last_seen": now, "is_active": True, "updated_at": now,
     }
@@ -128,6 +128,8 @@ def main():
         })
         if a.mode == "full":
             db.purge(PURGE_AFTER_DAYS)
+            from reclassify import reclassify
+            reclassify(db)          # apply any filter changes to jobs saved earlier
     print("Summary:", results)
     # Exit non-zero only if every site that ran failed (so the scheduler flags a real outage).
     if results and not any(r["ok"] for r in results.values()):
