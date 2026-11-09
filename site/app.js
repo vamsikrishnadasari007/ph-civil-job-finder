@@ -333,10 +333,10 @@
     $("#refresh").onclick = async () => {
       const btn = $("#refresh");
       btn.disabled = true;
-      btn.textContent = "Searching…";
+      btn.textContent = "Checking…";
       const r = await api("api/refresh");
       btn.disabled = false;
-      btn.textContent = "⟳ Search now";
+      btn.textContent = "↻ Check now";
       if (r) alert(r.data.message || r.data.error || "Done");
     };
     $("#dl-filtered").onclick = () => toExcel(filtered(), "Jobs_filtered");

@@ -50,8 +50,14 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .heart { animation: none; } }
 .sub { margin: 0 0 10px; color: var(--muted); max-width: 46ch; }
 .meta { margin: 0; font-size: 13px; color: var(--muted); }
-.meta-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
-.meta-row .btn { min-height: 32px; padding: 4px 12px; font-size: 13px; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: center; }
+/* Small text link; the 30-minute schedule does the real work, this is just "check right now". */
+.refresh {
+  background: none; border: 0; padding: 6px 4px; min-height: 32px; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 500; color: var(--rose);
+}
+.refresh:hover { text-decoration: underline; }
+.refresh:disabled { color: var(--muted); cursor: default; }
 .sources { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .src { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--chip); color: var(--muted); }
 .src.ok::before { content: "● "; color: var(--green); }
