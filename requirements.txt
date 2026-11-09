@@ -1,0 +1,4 @@
+python-jobspy==1.4.1
+httpx==0.28.1
+selectolax==1.0.2
+pytest==9.2.0

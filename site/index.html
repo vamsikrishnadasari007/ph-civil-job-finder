@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b4475f">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Jobs for My Love</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💛</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1>Hi My Love <span class="heart">💛</span></h1>
+      <p class="sub">Fresh civil engineering jobs, picked just for you. One good "yes" is all it takes, and you've got this.</p>
+      <div class="meta-row">
+        <p class="meta" id="updated">Loading jobs…</p>
+        <button class="btn" id="refresh" type="button">⟳ Search now</button>
+      </div>
+      <div class="sources" id="sources"></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="filters" aria-label="Filters">
+      <div class="frow">
+        <span class="flabel">Posted</span>
+        <div class="chips" id="f-time"></div>
+      </div>
+      <div class="frow">
+        <span class="flabel">Role</span>
+        <div class="chips" id="f-role"></div>
+      </div>
+      <div class="frow">
+        <span class="flabel">Area</span>
+        <div class="chips" id="f-area"></div>
+      </div>
+      <div class="frow">
+        <span class="flabel">Platform</span>
+        <div class="chips" id="f-platform"></div>
+      </div>
+      <div class="frow tools">
+        <input id="f-q" type="search" placeholder="Search title, company, place…" autocomplete="off">
+        <select id="f-sort" aria-label="Sort">
+          <option value="new">Newest first</option>
+          <option value="old">Oldest first</option>
+          <option value="salary">Salary shown first</option>
+        </select>
+        <label class="toggle"><input type="checkbox" id="f-salary"> Salary listed</label>
+        <label class="toggle"><input type="checkbox" id="f-email"> Has recruiter email</label>
+        <button class="link" id="f-reset" type="button">Reset</button>
+      </div>
+    </section>
+
+    <nav class="tabs" id="tabs" aria-label="Lists">
+      <button data-tab="all" class="on">All jobs <b id="n-all">0</b></button>
+      <button data-tab="new">New <b id="n-new">0</b></button>
+      <button data-tab="saved">Saved <b id="n-saved">0</b></button>
+      <button data-tab="applied">Applied <b id="n-applied">0</b></button>
+      <button data-tab="hidden">Hidden <b id="n-hidden">0</b></button>
+    </nav>
+
+    <p class="count" id="count"></p>
+    <div id="list" class="list"></div>
+
+    <section class="download">
+      <h2>Download everything</h2>
+      <p>An Excel sheet with every detail: post date and time, company, office address, recruiter email and phone, salary, the resume to send, and the job link.</p>
+      <div class="dl-buttons">
+        <button class="btn primary" id="dl-filtered" type="button">Download Excel (current filters)</button>
+        <button class="btn" id="dl-all" type="button">Download Excel (all jobs)</button>
+      </div>
+    </section>
+
+    <section class="more">
+      <h2>More places to check</h2>
+      <p>These can't be collected automatically (they need a login, or block bots), so here are direct links.</p>
+      <ul id="links"></ul>
+    </section>
+  </main>
+
+  <footer class="love">
+    <p>I love you ❤️</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
