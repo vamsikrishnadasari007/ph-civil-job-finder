@@ -145,9 +145,29 @@ details.desc pre {
   margin: 0; font-family: Fraunces, Georgia, serif; font-size: 26px; font-weight: 700; color: var(--rose);
 }
 
-@media (max-width: 520px) {
+.more-filters { display: grid; gap: 10px; }
+.ftoggle { display: none; }
+
+@media (max-width: 640px) {
   .frow { grid-template-columns: 1fr; gap: 4px; }
   .flabel { padding-top: 0; }
-  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  /* Chip rows swipe sideways; the fade on the right says "there's more". */
+  .chips {
+    flex-wrap: nowrap; overflow-x: auto; padding: 0 28px 2px 0; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  /* Only "Posted" is always visible; the rest folds away so jobs show on the first screen. */
+  .more-filters { display: none; }
+  .filters.open .more-filters { display: grid; }
+  .ftoggle {
+    display: flex; justify-content: space-between; align-items: center; width: 100%;
+    background: var(--chip); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px;
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; min-height: 40px;
+  }
+  .ftoggle::after { content: "▾"; color: var(--muted); }
+  .filters.open .ftoggle::after { content: "▴"; }
+  .ftoggle b { color: var(--rose); font-weight: 600; }
   .card { padding: 13px 14px; }
 }

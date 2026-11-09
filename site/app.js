@@ -182,6 +182,9 @@
     chipGroup($("#f-platform"), Object.keys(DATA.sources).map((p) => ({ label: p, value: p, count: pc[p] || 0 })),
       (v) => F.platforms.includes(v), true, (v) => { F.platforms = toggleIn(F.platforms, v); update(); });
 
+    const active = F.roles.length + F.exps.length + F.areas.length + F.platforms.length + (F.q ? 1 : 0) + (F.salary ? 1 : 0) + (F.email ? 1 : 0);
+    $("#f-toggle").innerHTML = active ? `More filters <b>(${active} active)</b>` : "More filters";
+
     $("#f-q").value = F.q;
     $("#f-sort").value = F.sort;
     $("#f-salary").checked = F.salary;
@@ -223,7 +226,7 @@
 
   function renderList() {
     const l = filtered();
-    const all = DATA.jobs;
+    const all = DATA.jobs.filter((j) => daysAgo(j) <= 14);   // same 2-week window as the list
     $("#n-all").textContent = all.length;
     $("#n-new").textContent = all.filter(isNew).length;
     $("#n-saved").textContent = all.filter((j) => saved.has(keyOf(j))).length;
@@ -307,6 +310,10 @@
     $("#f-salary").onchange = (e) => { F.salary = e.target.checked; update(); };
     $("#f-email").onchange = (e) => { F.email = e.target.checked; update(); };
     $("#f-reset").onclick = () => { F = defaults(); update(); };
+    $("#f-toggle").onclick = () => {
+      const open = $(".filters").classList.toggle("open");
+      $("#f-toggle").setAttribute("aria-expanded", String(open));
+    };
     $("#list").onclick = async (e) => {
       const b = e.target.closest("button[data-act]");
       if (!b || b.disabled) return;
@@ -343,10 +350,10 @@
 
   function renderHeader() {
     $("#updated").textContent = DATA.generated_at
-      ? `Updated ${agoText(DATA.generated_at)} · ${DATA.jobs.length} jobs in Metro Manila & nearby`
+      ? `Updated ${agoText(DATA.generated_at)} · ${DATA.jobs.filter((j) => daysAgo(j) <= 14).length} jobs in Metro Manila & nearby`
       : "The first search hasn't finished yet.";
     const perPlatform = {};
-    for (const j of DATA.jobs) for (const p of platformsOf(j)) perPlatform[p] = (perPlatform[p] || 0) + 1;
+    for (const j of DATA.jobs) if (daysAgo(j) <= 14) for (const p of platformsOf(j)) perPlatform[p] = (perPlatform[p] || 0) + 1;
     $("#sources").innerHTML = Object.entries(DATA.sources).map(([n, s]) => {
       const tip = s.ok ? `Last checked ${s.at ? agoText(s.at) : "–"}` : s.error;
       const label = s.running ? "searching…" : s.ok ? (perPlatform[n] || 0) : "blocked this time";
@@ -364,6 +371,14 @@
         if (m.saved) saved.add(k);
         if (m.applied) applied.add(k);
       }
+      // Hidden jobs come one row per platform: merge copies of the same job into one card.
+      const merged = new Map();
+      for (const h of d.hidden) {
+        const m = merged.get(h.dedupe_key);
+        if (!m) merged.set(h.dedupe_key, { ...h, also_on: [] });
+        else m.also_on.push({ platform: h.platform, url: h.url });
+      }
+      d.hidden = [...merged.values()];
       DATA = d;
       // Drop remembered filter values that no longer exist.
       F.roles = F.roles.filter((r) => r in d.roles);
